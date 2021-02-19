@@ -4,26 +4,23 @@ const sendError = require("../util/error");
 module.exports = {
   info: {
     name: "skipto",
-    description: "Pula para música selecionadas",
-    usage: "skipto <Número>",
+    description: "Toca a música selecionada",
+    usage: "<número>",
     aliases: ["st"],
   },
 
   run: async function (client, message, args) {
+    let channel = message.member.voice.channel;
+    if (!channel) return sendError("Você precisa está conectado a um canal de voz", message.channel);
+
     if (!args.length || isNaN(args[0]))
-      return message.channel.send({
-                        embed: {
-                            color: "PURPLE",
-                            description: `**Use**: \`${client.config.prefix}skipto <Número>\``
-                        }
-   
-                   }).catch(console.error);
+      return message.channel.send("Digite o nome da música para pular").catch(console.error);
         
 
     const queue = message.client.queue.get(message.guild.id);
-    if (!queue) return sendError("A lista está vazia",message.channel).catch(console.error);
+    if (!queue) return sendError("Não há uma lista",message.channel).catch(console.error);
     if (args[0] > queue.songs.length)
-      return sendError(`A fila é somente para ${queue.songs.length} músicas longas`,message.channel).catch(console.error);
+      return sendError(`Há somente ${queue.songs.length} músicas na lista`,message.channel).catch(console.error);
 
     queue.playing = true;
 
@@ -39,16 +36,10 @@ module.exports = {
       }catch (error) {
         queue.voiceChannel.leave()
         message.client.queue.delete(message.guild.id);
-       return sendError(`:notes: The player has stopped and the queue has been cleared.: ${error}`, message.channel);
+       return; //sendError(`${error}`, message.channel);
       }
     
-    queue.textChannel.send({
-                        embed: {
-                            color: "PURPLE",
-                            description: `${message.author} ⏭ Pulando \`${args[0] - 1}\` músicas`
-                        }
-   
-                   }).catch(console.error);
+    queue.textChannel.send(`⏩ **| Pulando ${args[0] - 1} músicas**`).catch(console.error);
                    message.react("✅")
 
   },

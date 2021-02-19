@@ -4,9 +4,9 @@ const sendError = require("../util/error");
 module.exports = {
   info: {
     name: "pause",
-    description: "Para a música que está sendo tocada",
-    usage: "[pause]",
-    aliases: ["pause"],
+    description: "Para a música que está tocando",
+    usage: "",
+    aliases: [""],
   },
 
   run: async function (client, message, args) {
@@ -17,14 +17,10 @@ module.exports = {
       serverQueue.connection.dispatcher.pause()
 	  } catch (error) {
         message.client.queue.delete(message.guild.id);
-        return sendError(`:notes: A música foi parada: ${error}`, message.channel);
+        return; //sendError(`${error}`, message.channel);
       }
-      let xd = new MessageEmbed()
-      .setDescription("⏸ Pausado")
-      .setColor("PURPLE")
-      .setTitle("A música foi parada")
-      return message.channel.send(xd);
+      return message.channel.send("⏸️ **| Música parada**");
     }
-    return sendError("Não há uma música ", message.channel);
+    return sendError("Não há uma música tocando", message.channel);
   },
 };

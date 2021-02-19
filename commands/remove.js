@@ -5,24 +5,26 @@ module.exports = {
   info: {
     name: "remove",
     description: "Remove uma música da lista",
-    usage: "rm <Número>",
+    usage: "<número>",
     aliases: ["rm"],
   },
 
   run: async function (client, message, args) {
-   const queue = message.client.queue.get(message.guild.id);
-    if (!queue) return sendError("A lista está vazia",message.channel).catch(console.error);
-    if (!args.length) return sendError(`Usage: ${client.config.prefix}\`remove <Queue Number>\``);
-    if (isNaN(args[0])) return sendError(`Usage: ${client.config.prefix}\`remove <Queue Number>\``);
-    if (queue.songs.length == 1) return sendError("A lista está vazia.",message.channel).catch(console.error);
+  let channel = message.member.voice.channel;
+    if (!channel) return sendError("Você precisa está conectado a um canal de voz", message.channel);
+  const queue = message.client.queue.get(message.guild.id);
+    if (!queue) return sendError("Não há uma lista",message.channel).catch(console.error);
+    if (!args.length) return sendError("Digite o número da música para remover");
+    if (isNaN(args[0])) return sendError("Digite o número da música para remover");
+    if (queue.songs.length == 1) return sendError("A lista está vazia",message.channel).catch(console.error);
     if (args[0] > queue.songs.length)
-      return sendError(`A fila é unica para ${queue.songs.length} músicas longas!`,message.channel).catch(console.error);
+      return sendError(`Há somente ${queue.songs.length} músicas na lista`,message.channel).catch(console.error);
 try{
     const song = queue.songs.splice(args[0] - 1, 1); 
-    sendError(`❌ **|** Foi removido: **\`${song[0].title}\`** da fila.`,queue.textChannel).catch(console.error);
-                   message.react("✅")
+    sendError(`**\`${song[0].title}\`** foi removido da lista`,queue.textChannel).catch(console.error);
+                   //message.react("✅")
 } catch (error) {
-        return sendError(`:notes: An unexpected error occurred.\nPossible type: ${error}`, message.channel);
+        return; //sendError(`:notes: An unexpected error occurred.\nPossible type: ${error}`, message.channel);
       }
   },
 };
