@@ -4,31 +4,31 @@ const sendError = require("../util/error");
 
 module.exports = {
   info: {
-    name: "letra",
-    description: "Mostra a letra da música que está sendo tocada",
-    usage: "[lyrics]",
-    aliases: ["ly, lyrics"],
+    name: "lyrics",
+    description: "Mostra a letra da música que está tocando",
+    usage: "[lyrics, letra ou ly]",
+    aliases: ["ly, letra"],
   },
 
   run: async function (client, message, args) {
     const queue = message.client.queue.get(message.guild.id);
-    if (!queue) return sendError("Não há uma música tocando agora",message.channel).catch(console.error);
+    if (!queue) return sendError("Não há uma música tocando",message.channel).catch(console.error);
 
     let lyrics = null;
 
     try {
       lyrics = await lyricsFinder(queue.songs[0].title, "");
-      if (!lyrics) lyrics = `No lyrics found for ${queue.songs[0].title}.`;
+      if (!lyrics) lyrics = `Não foi encontrada uma letra para ${queue.songs[0].title}.`;
     } catch (error) {
-      lyrics = `No lyrics found for ${queue.songs[0].title}.`;
+      lyrics = `Não foi encontrada uma letra para ${queue.songs[0].title}.`;
     }
 
     let lyricsEmbed = new MessageEmbed()
-      .setAuthor(`${queue.songs[0].title} — Letra`)
+      .setAuthor(`Letra de ${queue.songs[0].title}`)
       .setThumbnail(queue.songs[0].img)
-      .setColor("PURPLE")
-      .setDescription("Letra")
-      .setTimestamp();
+      .setColor("#FF00E5")
+      .setDescription(lyrics)
+      //.setTimestamp();
 
     if (lyricsEmbed.description.length >= 2048)
       lyricsEmbed.description = `${lyricsEmbed.description.substr(0, 2045)}...`;

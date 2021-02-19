@@ -3,15 +3,18 @@ const sendError = require("../util/error");
 
 module.exports = {
   info: {
-    name: "aleatório", 
-    description: "Toca a lista em uma ordem aleatória",
-    usage: "[aleatório]",
-    aliases: ["shuffle", "embaralhar"],
+    name: "shuffle",
+    description: "Toca as músicas em uma ordem aleatória",
+    usage: "[shuffle ou aleatório]",
+    aliases: ["shuffle", "aleatório"],
   },
 
   run: async function (client, message, args) {
+    let channel = message.member.voice.channel;
+    if (!channel) return sendError("Você precisa está conectado a um canal de voz", message.channel);
+
     const serverQueue = message.client.queue.get(message.guild.id);
-    if (!serverQueue) return sendError("A lista está vazia",message.channel).catch(console.error);
+    if (!serverQueue) return sendError("Não há uma lista",message.channel).catch(console.error);
 try{
     let songs = serverQueue.songs;
     for (let i = songs.length - 1; i > 1; i--) {
@@ -24,7 +27,7 @@ try{
       } catch (error) {
         message.guild.me.voice.channel.leave();
         message.client.queue.delete(message.guild.id);
-        return sendError(`:notes: The player has stopped and the queue has been cleared.: \`${error}\``, message.channel);
+        return; //sendError(`${error}`, message.channel);
      }
   },
 };
